@@ -7,7 +7,7 @@ import json
 
 
 PARTICLE_RADIUS = 0.025
-VOLUME_SAMPLING_BIN = '../../SPlisHSPlasH/bin/VolumeSampling.exe'
+VOLUME_SAMPLING_BIN = '../../SPlisHSPlasH/bin/VolumeSampling'
 
 
 def numpy_from_bgeo(path):
