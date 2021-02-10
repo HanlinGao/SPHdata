@@ -4,6 +4,8 @@ import tempfile
 import os
 import subprocess
 import json
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 
 PARTICLE_RADIUS = 0.025
@@ -109,13 +111,33 @@ def prepare_particles(scene):
         pos = np.concatenate([pos, points], axis=0)
         vel = np.concatenate([vel, velocities], axis=0)
 
-    print(box)
-    print(pos)
-    print(vel)
+    return box, box_normals, pos, vel
+
+
+def visualize_prepared(prepared_box, prepared_fluids):
+    fig = plt.figure()
+    ax = fig.add_subplot(projection='3d')
+
+    box_x = prepared_box[:, 0]
+    box_y = prepared_box[:, 1]
+    box_z = prepared_box[:, 2]
+
+    fluid_x = prepared_fluids[:, 0]
+    fluid_y = prepared_fluids[:, 1]
+    fluid_z = prepared_fluids[:, 2]
+
+    ax.scatter(box_x, box_y, box_z, c='grey', marker='o', alpha=0.2)
+    ax.scatter(fluid_x, fluid_y, fluid_z, c='r', marker='o', alpha=0.7)
+
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_zlabel('z')
+
+    plt.show()
 
 
 if __name__ == '__main__':
     scene = '../settings/example_scene.json'
     with open(scene, 'r') as f:
         scene_obj = json.load(f)
-    prepare_particles(scene_obj)
+    box, box_normals, pos, vel = prepare_particles(scene_obj)
