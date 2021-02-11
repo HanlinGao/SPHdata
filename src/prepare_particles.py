@@ -88,7 +88,7 @@ def write_particles(path_without_ext, pos, vel=None):
     o3d.io.write_point_cloud('../out_ply/' + path_without_ext + '.ply', pcd)
 
 
-def prepare_particles(scene, output_dir):
+def prepare_particles(scene, scale, output_dir):
     """generate initial data of box, box_normals, fluid_pos, fluid_vel according to the input json file
 
     :param scene: set path to box.obj and fluid.obj, as well as the translation of positions
@@ -111,7 +111,7 @@ def prepare_particles(scene, output_dir):
     # prepare fluids
     fluids = []
     for x in scene['fluids']:
-        points = obj_volume_to_particles(x['path'])[0]
+        points = obj_volume_to_particles(x['path'], scale)[0]
         points += np.asarray([x['translation']], dtype=np.float32)
         velocities = np.empty_like(points)
         velocities[:, 0] = x['velocity'][0]
@@ -146,7 +146,7 @@ def mat_visualize_prepared(prepared_box=np.empty(shape=(0, 3)), prepared_fluids=
         fluid_x = prepared_fluids[:, 0]
         fluid_y = prepared_fluids[:, 1]
         fluid_z = prepared_fluids[:, 2]
-        ax.scatter(fluid_x, fluid_z, fluid_y, c='black', marker='o')
+        ax.scatter(fluid_x, fluid_z, fluid_y, c='orange', marker='o', alpha=0.4)
 
     ax.set_xlabel('x')
     ax.set_ylabel('y')
@@ -154,7 +154,6 @@ def mat_visualize_prepared(prepared_box=np.empty(shape=(0, 3)), prepared_fluids=
     ax.set_xlim(-1, 1)
     ax.set_ylim(-1, 1)
     ax.set_zlim(0, 4)
-
 
     plt.show()
 # def o3d_visualize_prepared(path_to_pcd):
@@ -164,16 +163,21 @@ def mat_visualize_prepared(prepared_box=np.empty(shape=(0, 3)), prepared_fluids=
 #     o3d.visualization.draw_geometries([box_pcd, fluid_pcd])
 
 
-if __name__ == '__main__':
-    scene = '../settings/example_scene.json'
-    with open(scene, 'r') as f:
+def create_initial_scene(scene_file, scale, output_dir):
+    with open(scene_file, 'r') as f:
         scene_obj = json.load(f)
-    box, box_normals, pos, vel = prepare_particles(scene_obj, 'out_put')
+    box, box_normals, pos, vel = prepare_particles(scene_obj, scale, output_dir)
     print(np.max(box, axis=0))
     print(np.min(box, axis=0))
-
     print(np.max(pos, axis=0))
     print(np.min(pos, axis=0))
     mat_visualize_prepared(prepared_fluids=pos)
-
     # o3d_visualize_prepared('../out_ply/out_put')
+
+
+if __name__ == '__main__':
+    # create_initial_scene('../settings/fill_upper.json', 2, 'upper_output')
+    # create_initial_scene('../settings/fill_bottom.json', 2, 'bottom_output')
+    # create_initial_scene('../settings/fill_left.json', 1, 'left_output')
+    # create_initial_scene('../settings/fill_middle.json', 1, 'middle_output')
+    create_initial_scene('../settings/fill_right.json', 1, 'right_output')
